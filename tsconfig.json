@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+    	"strict": true,
+    	"module": "commonjs",
+    	"lib": ["dom", "es7"],
+    	"allowSyntheticDefaultImports": true,
+    	"emitDecoratorMetadata": true,
+	    "experimentalDecorators": true,
+	    "moduleResolution": "node",
+    	"declaration": true,
+    	"outDir": "v3/",
+    	"target": "es6"
+    },
+    "include": [
+        "ts/**/*.ts"
+    ],
+    "compileOnSave": false,
+    "exclude": [
+	    "node_modules"
+	]
+}
