@@ -16,11 +16,15 @@ export const config = common.config
 // 中间件
 export const middleware = (fn: Function) => common.$event.on('middleware', fn)
 // 开启服务
-export const start = async(fn: Function) => common.$event.once('start', fn)
+export const start = (fn: Function) => common.$event.once('start', fn)
+// 安装完毕
+export const ready = (fn: Function) => common.$event.on('ready', fn)
 // 安装
 export const install = async(setting: any) => {
 	// 初始化配置
 	await common.config(setting)
 	// 触发安装
-	return await common.$event.emit('install', common)
+	await common.$event.emit('install', common)
+	// 触发ready回调
+	return await common.$event.emit('ready')
 }

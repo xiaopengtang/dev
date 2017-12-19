@@ -1,133 +1,86 @@
+/**
+ * STATE模块
+*/
 import * as common from '../../../common'
 
-// 注册器
-/* export namespace Register{
-    export const vue = async(Vue: any, Vuex: any, Router: any) => {
-        // 
-    }
-} */
-
-export namespace Common {
-    export const classifyRegister = (config: any, params?: any) => {
-        let modules: any = {}
-        let { router, namespace }: { router: string | string[], namespace: string | string[]} = params || {}
-        router = Array.isArray(router) && (router as Array<string>) || common.utils.isString(router) && [(router as string)] || []
-        namespace = Array.isArray(namespace) && (namespace as Array<string>) || common.utils.isString(namespace) && [(<string>namespace)] || []
-        Object.keys(config).forEach(name => {
-            let route: string[] = [...router]
-            const register = config[name]
-            register.namespace = register.namespace ? register.namespace : JSON.parse(JSON.stringify(namespace))
-            route.push(name)
-            let key:string = route.join(":")
-            register.isRoot = false
-            if (register.store) {
-                register.namespace.push(name)
-                register.isRoot = true
-            }
-            register.key = key
-            modules[key] = register
-            const childModules = register.modules ? classifyRegister(register.modules, { 'router': key, 'namespace': register.namespace }) : null
-            if (!childModules) {
-                return
-            }
-            register.modules = null
-            modules = Object.assign(modules, childModules)
-        })
-        return modules
-    }
-    // 实例化
-    export const createInstance = <A extends Base> (c: new () => A, props: any): A => {
-        // 扩展属性
-        Object.keys(props).forEach(name => c.prototype[name] = props[name])
-        // 实例
-        return new c()
-    }
-    // 访问器
-    export const commit = async(name: string, ...rest: any[]) => {
-        // 
-    }
-}
-export namespace BaseBehovir{
-    export const validator = async(...arg: any[]) => {
-    }
-}
-export const ExtendBaseBehovir = (_class: any) => {
-    _class.prototype.validator = BaseBehovir.validator
-    return _class
-}
-@ExtendBaseBehovir
-// 基类
 export class Base {
-    // 验证器
-    validator: Promise<any>
-}
-// 扩展属性
-export const ExtendBehovior = (_class: any) => {
-    _class.prototype.classifyRegister = Common.classifyRegister
-    _class.prototype.createInstance = Common.createInstance
-    _class.prototype.commit = Common.commit
-    return _class
-}
-// 扩展行为
-@ExtendBehovior
-export class StateCore {
-    classifyRegister: (_class: any) => any 
-    // 创建一个实例
-    createInstance: (register: any, props: any) => any
-    commit: Promise<any>
-    protected $register: any = {}
-    protected $ctrl: any = {}
-    async install(state?: any){
-        state = state || common.config('state')
-        this.$register = this.classifyRegister(state)
-    }
-    // 自动更新
-    auto($app: any){
-        const {$router}: {$router: any} = $app
-        let arr: string[] = $router.to.name.split(':')
-        arr.forEach((str: string, index: number) => {
-            let key: string = arr.slice(0, index).join(':')
-            let register = this.$register[key]
-            this.$ctrl[key] = this.createInstance(register, {$app})
-        })
+    destory(fn: Function){
+        return common.$event.on('state:destory', fn)
     }
 }
-// 实例化
-const $state: StateCore = new StateCore()
-
-export interface StateSetting {
-    mixin?: Array<any>,
-    middleware?: any,
-    before?: Function | string[] | string,
-    store?: any,
-    validator?: Array<string|any>,
-    namespace?: string | string[]
+export namespace check {
+    export interface State{
+        middleware?: any,
+        store?: any,
+        mixin?: string | string[],
+        validator?: any,
+        namespace?: string | string[],
+        use?: string | string[]
+        // extends?: string | any
+    }
 }
-// 用于修饰
 export namespace State {
-    // 类型修饰
-    export const State = (setting: StateSetting) => (_class: any) => {
-        // _class.
+    // 中间件
+    export const Middleware = (_class: any) => {}
+    // 
+    export const State = (setting: check.State) => {
+        // 命名空间
+        setting.namespace = common.utils.isString(setting.namespace) && [<string>setting.namespace] || Array.isArray(setting.namespace) && setting.namespace || []
+        return (_class: any) => {
+            // namespace && (_class.namespace = namespace)
+        }
     }
-    // 后置方法
-    export const Before = (_proto: any, _name: string) => {}
-    // index 位置
-    export const Index = (_proto: any, _name: string, descriptor: any) => {
-        // 定义一个
-        Object.defineProperty(_proto, 'IndexActionName', {
-            configurable: false,
-            writable: false,
-            value: name
-        })
+    // 
+    export const Before = (_class: any, name: string) => {}
+    // 
+    export const After = (_class: any, name: string) => {}
+    // 
+    export const Index = (_class: any, name: string) => { }
+    // 
+    export const Validator = (_class: any) => {}
+}
+
+export class Visit {
+    $action: Function
+    constructor(action: Function){
+        this.$action = action
     }
-    // 验证
-    export const Validate = (_proto: any, _name: string) => {}
 }
-// 监听
-export const listen = async($app: any) => {
-    $state.auto($app)
+
+export class Register {
+    constructor(props: any){
+        // 
+    }
 }
+
+export class StateCore {
+    protected $register: Base
+    // 
+    async createRegister(param: any){
+        // 
+    }
+}
+
 // 安装
 export default async(common: any) => {
-    return $state.install()
+    const router: any = await common.$register.use('vue:router')
+    const store:any = await common.$register.use('vue:vuex')
+    const $state = new StateCore()
+    // 卸载相关数据
+    router.beforeResolve(async (to: any, fm: any, next: Function) => {
+        if (!fm) {
+            return
+        }
+        // 销毁store
+        next()
+    })
+
+    return {
+        async listen(params: any){
+            if (params.from){
+                await common.$event.emit('state:destory')
+            }
+            $state.createRegister(params)
+        }
+    }
 }

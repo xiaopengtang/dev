@@ -10,11 +10,16 @@ class Register {
     private $container = new Container()
     private $modules: any = {}
     private $config: any = {}
-    constructor(setting: any){
+    constructor(setting?: any){
         setting = utils.isObject(setting) ? setting : {}
-        this.$config.protected = !!setting.protected
+        // 
+        Object.defineProperty(this.$config, 'protected', {
+            value: !!setting.protected,
+            writable: false,
+            configurable: false
+        })
     }
-    async create(name: string ,support: string|Array<string>|Function, creater: undefined | Function){
+    async create(name: string ,support: string|Array<string>|Function, creater?: undefined | Function){
         creater = utils.isFunction(support) ? (<Function>support) : (<Function>creater)
         if (!creater || !name){
             return 
@@ -29,7 +34,7 @@ class Register {
         // 访问器
         Object.defineProperties($modules, {
             [name]: {
-                value: async () => {
+                get: async () => {
                     let ret: any = support ? await this.$container.ensure(support as Array<string>, <Function>creater) : (<Function>creater)()
                     return ret
                 },
@@ -40,7 +45,7 @@ class Register {
         let plugin: any = await $modules[name]
         return plugin
     }
-    async use(name: string){
+    async use(name: string, ...rest: any[]){
         let isProtect: boolean = this.$config.protected
         let $modules: any = isProtect ? this.$modules : COMMON
         return await $modules[name]

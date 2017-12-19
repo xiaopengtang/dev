@@ -23,7 +23,7 @@ const IS_WIN: boolean = typeof self !== 'undefined' && self.self === self
 
 export const jsonp = (params: any): Promise<any> => {
     return new Promise((resolve, reject) => {
-        if (IS_WIN) {
+        if (!IS_WIN) {
             return
         }
         const $win: any = typeof self !== 'undefined' && self.self === self && self

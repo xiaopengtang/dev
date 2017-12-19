@@ -58,7 +58,7 @@ namespace Modules {
         return FN(CONFIG[module])
     }
 }
-const config = async(key: any, value?: any) => {
+const config = (key: any, value?: any) => {
     let reader
     if (utils.isString(key) && utils.isFunction(value)) {
         reader = (resolve: Function, oldValue: any) => {
