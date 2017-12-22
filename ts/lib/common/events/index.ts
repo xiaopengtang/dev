@@ -27,6 +27,12 @@ export namespace Interface {
 		$events?: Array<Function>,
 		ctx: any
 	}
+
+	export interface ListenerValidateParam{
+		$events?: Array<Function>,
+		ctx?: any,
+		params?: any[]
+	}
 }
 
 export namespace Modules {
@@ -59,8 +65,8 @@ export namespace Modules {
 		return result
 	}
 	// next 运行
-	export const next = async (arg: Interface.ListenerNextParam) => {
-		const { $events, ctx } = arg
+	export const next = async (arg: Interface.ListenerValidateParam) => {
+		const { $events, ctx , params} = arg
 		if (!$events || $events && $events.length === 0) {
 			return
 		}
@@ -79,21 +85,23 @@ export namespace Modules {
 			let core: Promise<any> = (<Function>evt).apply(ctx, next)
 			return core.catch(e => $error.throw(e))
 		})
-		// let status: boolean = true
 		let result: any  = await fn() 
-		/* try {
-			result = await fn() 
-		} catch (e) {
-			status = false
-			result = e
-			$error.throw(e)
-		} */
 		if (result instanceof Error || $events.length === 0){
 			return result
 		}
 		result = await next({ ctx, $events })
 		return result
 	}
+	// 
+	/* export const validate = (arg: Interface.ListenerNextParam) => {
+		return new Promise((resolve, reject) => {
+			const { $events, ctx } = arg
+			if (!$events || Array.isArray($events) && $events.length === 0) {
+				return resolve()
+			}
+			const [validator, ...rest] = $events
+		})
+	} */
 }
  
 class events {
@@ -121,6 +129,9 @@ class events {
 		const result: any = await Modules.next({$events, ctx})
 		return result
 	}
+	/* validate(name: string, ...rest: any[]){
+		// 
+	} */
 	//
 	removeListener(name: string){
 		return delete this.$events.once[name]

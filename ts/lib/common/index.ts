@@ -9,9 +9,9 @@ const $register = new Register({'protected': true})
 const $event = new events()
 const $container = new Container()
 const $error = new Excepition()
-const $userRegister = new Register()
+// const $userRegister = new Register()
 
 export {proto} from './proto'
-export { $register, $event, $container, $error, $userRegister}
+export { $register, $event, $container, $error}
 export {config} from './config'
 export { utils, Excepition } 

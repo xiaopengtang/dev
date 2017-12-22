@@ -2,43 +2,16 @@
  * STATE模块
 */
 import * as common from '../../../common'
+import {Base} from './base'
 
-export class Base {
+
+export { State } from './decorator'
+
+/* export class Base {
     destory(fn: Function){
         return common.$event.on('state:destory', fn)
     }
-}
-export namespace check {
-    export interface State{
-        middleware?: any,
-        store?: any,
-        mixin?: string | string[],
-        validator?: any,
-        namespace?: string | string[],
-        use?: string | string[]
-        // extends?: string | any
-    }
-}
-export namespace State {
-    // 中间件
-    export const Middleware = (_class: any) => {}
-    // 
-    export const State = (setting: check.State) => {
-        // 命名空间
-        setting.namespace = common.utils.isString(setting.namespace) && [<string>setting.namespace] || Array.isArray(setting.namespace) && setting.namespace || []
-        return (_class: any) => {
-            // namespace && (_class.namespace = namespace)
-        }
-    }
-    // 
-    export const Before = (_class: any, name: string) => {}
-    // 
-    export const After = (_class: any, name: string) => {}
-    // 
-    export const Index = (_class: any, name: string) => { }
-    // 
-    export const Validator = (_class: any) => {}
-}
+} */
 
 export class Visit {
     $action: Function
